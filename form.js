@@ -1,53 +1,6 @@
 // we-rando — "Je veux être informé" form handler
 
 (function () {
-  // ─── Airtable config ───────────────────────────────────────────────────────
-  // Remplacez VOTRE_TOKEN par un Personal Access Token Airtable
-  // (airtable.com/create/tokens) avec le scope data.records:write sur la base.
-  // En production, ne jamais exposer ce token côté client — passez par un proxy.
-  // Défini dans config.js (non versionné) : var AIRTABLE_TOKEN = 'patXXX...';
-  var AIRTABLE_TOKEN = window.AIRTABLE_TOKEN || '';
-  var AIRTABLE_BASE  = 'appY20zCunDeN9qLS';
-  var AIRTABLE_TABLE = 'tblxVBBDsNJjDMayp';
-  // ───────────────────────────────────────────────────────────────────────────
-
-  // Correspondances valeurs form → libellés Airtable
-  var INTENTION_MAP = {
-    projet_6mois:    'Projet concret dans les 6 mois',
-    annee_prochaine: "Projet pour l'année prochaine",
-    en_maturation:   'Idée en cours de maturation',
-    curieux:         'Juste pour être au courant',
-  };
-
-  var GROUPE_MAP = {
-    solo:       'Solo',
-    duo:        'Duo',
-    amis:       'Entre amis',
-    famille:    'En famille',
-    entreprise: 'Entreprise / CE',
-    nsp:        'Je ne sais pas encore',
-  };
-
-  var PERIODE_MAP = {
-    printemps: 'Printemps',
-    ete:       'Été',
-    automne:   'Automne',
-    hiver:     'Hiver',
-    nsp:       'Pas encore défini',
-  };
-
-  var NOTIFICATION_MAP = {
-    email_seul:  'Email dès publication',
-    email_appel: 'Email + appel Franck',
-    auto:        'Je reviendrai consulter',
-  };
-
-  var SIMILAIRES_MAP = {
-    similaires:        'Oui — même destination / même esprit',
-    toutes:            'Oui — toute nouveauté we-rando',
-    uniquement_celle_ci: 'Non — uniquement celle-ci',
-  };
-
   // Pre-fill hidden inspiration field from URL param ?inspiration=nom-du-sejour
   var params = new URLSearchParams(window.location.search);
   var inspirationParam = params.get('inspiration');
@@ -116,20 +69,14 @@
     });
   });
 
-  // --- Airtable submission ---
+  // --- Envoi via fonction Netlify (le token reste côté serveur) ---
 
-  function sendToAirtable(fields) {
-    return fetch(
-      'https://api.airtable.com/v0/' + AIRTABLE_BASE + '/' + AIRTABLE_TABLE,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + AIRTABLE_TOKEN,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ records: [{ fields: fields }] }),
-      }
-    ).then(function (res) {
+  function sendToAirtable(payload) {
+    return fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).then(function (res) {
       if (!res.ok) return res.json().then(function (e) { throw e; });
       return res.json();
     });
@@ -188,33 +135,24 @@
       return;
     }
 
-    // Build Airtable fields object
-    var fields = {
-      'Prénom':                   prenom,
-      'Email':                    email,
-      'Intention':                INTENTION_MAP[getRadioValue('intention')],
-      'Préférence de notification': NOTIFICATION_MAP[getRadioValue('notification')],
-      'Inspirations similaires':  SIMILAIRES_MAP[getRadioValue('similaires')],
-      'Date soumission':          new Date().toISOString(),
+    // Build payload (mappings gérés côté serveur dans netlify/functions/submit.js)
+    var payload = {
+      prenom:       prenom,
+      email:        email,
+      intention:    getRadioValue('intention'),
+      notification: getRadioValue('notification'),
+      similaires:   getRadioValue('similaires'),
+      inspiration:  document.getElementById('inspiration').value,
+      groupe:       getRadioValue('groupe'),
+      periode:      getRadioValue('periode'),
+      message:      form.querySelector('#message').value.trim(),
     };
-
-    var inspiration = document.getElementById('inspiration').value;
-    if (inspiration) fields['Inspiration'] = inspiration;
-
-    var groupe = getRadioValue('groupe');
-    if (groupe) fields['Type de groupe'] = GROUPE_MAP[groupe];
-
-    var periode = getRadioValue('periode');
-    if (periode) fields['Période souhaitée'] = PERIODE_MAP[periode];
-
-    var message = form.querySelector('#message').value.trim();
-    if (message) fields['Message pour Franck'] = message;
 
     // Disable button during request
     submitBtn.disabled = true;
     submitBtn.textContent = 'Envoi en cours…';
 
-    sendToAirtable(fields)
+    sendToAirtable(payload)
       .then(function () {
         form.classList.add('hidden');
         confirmation.classList.remove('hidden');
