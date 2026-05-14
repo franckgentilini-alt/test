@@ -1,0 +1,349 @@
+/* ============================================
+   we-rando — Formulaire "Je veux être informé"
+   Couleur principale : #3C3489 (violet)
+   ============================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-primary: #3C3489;
+  --color-primary-light: #5b52b0;
+  --color-primary-bg: #f0effb;
+  --color-text: #1a1a2e;
+  --color-text-muted: #6b6b8a;
+  --color-border: #d9d8f0;
+  --color-error: #d94f4f;
+  --color-success: #27ae60;
+  --color-white: #ffffff;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(60, 52, 137, 0.10);
+  --transition: 0.18s ease;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #ededfb 0%, #f8f8ff 100%);
+  min-height: 100vh;
+  color: var(--color-text);
+  padding: 2rem 1rem;
+}
+
+/* ---- Layout ---- */
+.form-wrapper {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ---- Header ---- */
+.form-header {
+  background: var(--color-white);
+  border-radius: var(--radius);
+  padding: 2.5rem 2rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+  border-top: 4px solid var(--color-primary);
+  text-align: center;
+}
+
+.badge {
+  display: inline-block;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.85rem;
+  border-radius: 100px;
+  margin-bottom: 1rem;
+}
+
+.form-header h1 {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  line-height: 1.25;
+  margin-bottom: 0.85rem;
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ---- Bloc ---- */
+.form-bloc {
+  background: var(--color-white);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.bloc-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--color-primary-bg);
+}
+
+/* ---- Field ---- */
+.field {
+  margin-bottom: 1.5rem;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+.field > label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+}
+
+.field-hint {
+  font-size: 0.83rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.required {
+  color: var(--color-primary);
+}
+
+input[type="text"],
+input[type="email"],
+textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.97rem;
+  color: var(--color-text);
+  background: #fafafa;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(60, 52, 137, 0.12);
+  background: var(--color-white);
+}
+
+input.invalid,
+textarea.invalid {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(217, 79, 79, 0.10);
+}
+
+.field-error {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--color-error);
+  margin-top: 0.35rem;
+  min-height: 1rem;
+}
+
+/* ---- Radio cards (full) ---- */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.radio-card {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  cursor: pointer;
+}
+
+.radio-card input[type="radio"] {
+  display: none;
+}
+
+.radio-card .radio-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  background: #fafafa;
+  transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+}
+
+.radio-card input[type="radio"]:checked + .radio-content {
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
+  box-shadow: 0 0 0 3px rgba(60, 52, 137, 0.10);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.radio-card:hover .radio-content {
+  border-color: var(--color-primary-light);
+  background: var(--color-white);
+}
+
+.radio-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* ---- Chips (compact radio) ---- */
+.radio-group.chips {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip-card {
+  cursor: pointer;
+}
+
+.chip-card input[type="radio"] {
+  display: none;
+}
+
+.chip-card span {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 100px;
+  font-size: 0.88rem;
+  background: #fafafa;
+  color: var(--color-text-muted);
+  transition: border-color var(--transition), background var(--transition), color var(--transition);
+  white-space: nowrap;
+}
+
+.chip-card input[type="radio"]:checked + span {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-weight: 600;
+}
+
+.chip-card:hover span {
+  border-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+/* ---- Group invalid state ---- */
+.radio-group.invalid .radio-content,
+.radio-group.invalid .chip-card span {
+  border-color: var(--color-error);
+}
+
+/* ---- Submit button ---- */
+.btn-submit {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  box-shadow: 0 4px 16px rgba(60, 52, 137, 0.25);
+  margin-bottom: 2rem;
+}
+
+.btn-submit:hover {
+  background: var(--color-primary-light);
+  box-shadow: 0 6px 24px rgba(60, 52, 137, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-submit:active {
+  transform: translateY(0);
+}
+
+/* ---- Confirmation screen ---- */
+.confirmation {
+  background: var(--color-white);
+  border-radius: var(--radius);
+  padding: 3rem 2rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border-top: 4px solid var(--color-success);
+}
+
+.confirmation-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+.confirmation h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.confirmation p {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.btn-return {
+  display: inline-block;
+  padding: 0.9rem 2rem;
+  background: var(--color-primary);
+  color: var(--color-white);
+  text-decoration: none;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 1rem;
+  transition: background var(--transition);
+}
+
+.btn-return:hover {
+  background: var(--color-primary-light);
+}
+
+/* ---- Utility ---- */
+.hidden {
+  display: none;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 480px) {
+  .form-header {
+    padding: 2rem 1.25rem 1.5rem;
+  }
+
+  .form-header h1 {
+    font-size: 1.35rem;
+  }
+
+  .form-bloc {
+    padding: 1.5rem 1.25rem;
+  }
+}

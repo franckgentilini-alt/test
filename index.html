@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Je veux être informé — we-rando</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="form-wrapper">
+    <!-- Header -->
+    <div class="form-header">
+      <div class="badge">Avant-première</div>
+      <h1>Cette aventure vous intrigue&nbsp;?&nbsp;👀</h1>
+      <p class="subtitle">
+        Franck est encore en train de la concevoir. Laissez-nous votre contact
+        et vous serez parmi les premiers à la découvrir — et à pouvoir la
+        personnaliser.
+      </p>
+    </div>
+
+    <!-- Form -->
+    <form id="we-rando-form" novalidate>
+      <!-- Hidden field: inspiration name via URL param -->
+      <input type="hidden" id="inspiration" name="inspiration" value="" />
+
+      <!-- Bloc 1 — Identification -->
+      <section class="form-bloc">
+        <h2 class="bloc-title">Vos coordonnées</h2>
+
+        <div class="field">
+          <label for="prenom">Votre prénom <span class="required">*</span></label>
+          <input type="text" id="prenom" name="prenom" placeholder="Ex : Sophie" autocomplete="given-name" required />
+          <span class="field-error" id="prenom-error"></span>
+        </div>
+
+        <div class="field">
+          <label for="email">Votre email <span class="required">*</span></label>
+          <input type="email" id="email" name="email" placeholder="sophie@exemple.com" autocomplete="email" required />
+          <span class="field-error" id="email-error"></span>
+        </div>
+
+        <div class="field">
+          <label>Cette inspiration vous intéresse-t-elle pour… <span class="required">*</span></label>
+          <div class="radio-group" id="intention-group">
+            <label class="radio-card">
+              <input type="radio" name="intention" value="projet_6mois" required />
+              <span class="radio-content">
+                <span class="radio-icon">🎯</span>
+                <span>Un projet concret dans les 6 mois</span>
+              </span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="intention" value="annee_prochaine" />
+              <span class="radio-content">
+                <span class="radio-icon">📅</span>
+                <span>Un projet pour l'année prochaine</span>
+              </span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="intention" value="en_maturation" />
+              <span class="radio-content">
+                <span class="radio-icon">🌱</span>
+                <span>Une idée en cours de maturation</span>
+              </span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="intention" value="curieux" />
+              <span class="radio-content">
+                <span class="radio-icon">👀</span>
+                <span>Juste pour être au courant</span>
+              </span>
+            </label>
+          </div>
+          <span class="field-error" id="intention-error"></span>
+        </div>
+      </section>
+
+      <!-- Bloc 2 — Contexte rapide -->
+      <section class="form-bloc">
+        <h2 class="bloc-title">Contexte rapide</h2>
+
+        <div class="field">
+          <label>Ce serait pour quel type de groupe&nbsp;?</label>
+          <div class="radio-group chips" id="groupe-group">
+            <label class="chip-card">
+              <input type="radio" name="groupe" value="solo" />
+              <span>Solo</span>
+            </label>
+            <label class="chip-card">
+              <input type="radio" name="groupe" value="duo" />
+              <span>Duo</span>
+            </label>
+            <label class="chip-card">
+              <input type="radio" name="groupe" value="amis" />
+              <span>Entre amis</span>
+            </label>
+            <label class="chip-card">
+              <input type="radio" name="groupe" value="famille" />
+              <span>En famille</span>
+            </label>
+            <label class="chip-card">
+              <input type="radio" name="groupe" value="entreprise" />
+              <span>Entreprise / CE</span>
+            </label>
+            <label class="chip-card">
+              <input type="radio" name="groupe" value="nsp" />
+              <span>Je ne sais pas encore</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Avez-vous une idée de la période souhaitée&nbsp;?</label>
+          <div class="radio-group chips" id="periode-group">
+            <label class="chip-card">
+              <input type="radio" name="periode" value="printemps" />
+              <span>🌸 Printemps</span>
+            </label>
+            <label class="chip-card">
+              <input type="radio" name="periode" value="ete" />
+              <span>☀️ Été</span>
+            </label>
+            <label class="chip-card">
+              <input type="radio" name="periode" value="automne" />
+              <span>🍂 Automne</span>
+            </label>
+            <label class="chip-card">
+              <input type="radio" name="periode" value="hiver" />
+              <span>❄️ Hiver</span>
+            </label>
+            <label class="chip-card">
+              <input type="radio" name="periode" value="nsp" />
+              <span>Pas encore défini</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="message">Un message pour Franck&nbsp;?</label>
+          <p class="field-hint">Question sur le projet, ajustement souhaité, contexte particulier…</p>
+          <textarea id="message" name="message" rows="4" placeholder="Écrivez ici…"></textarea>
+        </div>
+      </section>
+
+      <!-- Bloc 3 — Préférences de notification -->
+      <section class="form-bloc">
+        <h2 class="bloc-title">Préférences de notification</h2>
+
+        <div class="field">
+          <label>Comment souhaitez-vous être prévenu&nbsp;? <span class="required">*</span></label>
+          <div class="radio-group" id="notification-group">
+            <label class="radio-card">
+              <input type="radio" name="notification" value="email_seul" required />
+              <span class="radio-content">
+                <span class="radio-icon">📧</span>
+                <span>Par email dès que l'inspiration est publiée</span>
+              </span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="notification" value="email_appel" />
+              <span class="radio-content">
+                <span class="radio-icon">📞</span>
+                <span>Par email + appel de Franck si projet concret</span>
+              </span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="notification" value="auto" />
+              <span class="radio-content">
+                <span class="radio-icon">🔄</span>
+                <span>Je préfère revenir consulter le site</span>
+              </span>
+            </label>
+          </div>
+          <span class="field-error" id="notification-error"></span>
+        </div>
+
+        <div class="field">
+          <label>Souhaitez-vous aussi recevoir d'autres inspirations similaires&nbsp;? <span class="required">*</span></label>
+          <div class="radio-group" id="similaires-group">
+            <label class="radio-card">
+              <input type="radio" name="similaires" value="similaires" required />
+              <span class="radio-content">
+                <span class="radio-icon">🗺️</span>
+                <span>Oui, même destination / même esprit</span>
+              </span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="similaires" value="toutes" />
+              <span class="radio-content">
+                <span class="radio-icon">✨</span>
+                <span>Oui, toute nouveauté we-rando</span>
+              </span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="similaires" value="uniquement_celle_ci" />
+              <span class="radio-content">
+                <span class="radio-icon">🎯</span>
+                <span>Non, uniquement celle-ci</span>
+              </span>
+            </label>
+          </div>
+          <span class="field-error" id="similaires-error"></span>
+        </div>
+      </section>
+
+      <button type="submit" class="btn-submit">
+        Je veux être informé en avant-première →
+      </button>
+    </form>
+
+    <!-- Confirmation screen (hidden by default) -->
+    <div id="confirmation" class="confirmation hidden">
+      <div class="confirmation-icon">✨</div>
+      <h2>C'est noté&nbsp;! Vous serez en avant-première.</h2>
+      <p>
+        Franck vous prévient dès que cette inspiration est prête.<br />
+        Votre intérêt nous aide à prioriser sa conception — merci&nbsp;!
+      </p>
+      <a href="https://we-rando.com" class="btn-return">Retour sur we-rando →</a>
+    </div>
+  </div>
+
+  <script src="form.js"></script>
+</body>
+</html>
