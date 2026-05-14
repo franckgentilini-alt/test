@@ -5,7 +5,8 @@
   // Remplacez VOTRE_TOKEN par un Personal Access Token Airtable
   // (airtable.com/create/tokens) avec le scope data.records:write sur la base.
   // En production, ne jamais exposer ce token côté client — passez par un proxy.
-  var AIRTABLE_TOKEN = 'VOTRE_TOKEN';
+  // Défini dans config.js (non versionné) : var AIRTABLE_TOKEN = 'patXXX...';
+  var AIRTABLE_TOKEN = window.AIRTABLE_TOKEN || '';
   var AIRTABLE_BASE  = 'appY20zCunDeN9qLS';
   var AIRTABLE_TABLE = 'tblxVBBDsNJjDMayp';
   // ───────────────────────────────────────────────────────────────────────────
