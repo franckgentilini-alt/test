@@ -1,48 +1,95 @@
 // we-rando — "Je veux être informé" form handler
 
 (function () {
+  // ─── Airtable config ───────────────────────────────────────────────────────
+  // Remplacez VOTRE_TOKEN par un Personal Access Token Airtable
+  // (airtable.com/create/tokens) avec le scope data.records:write sur la base.
+  // En production, ne jamais exposer ce token côté client — passez par un proxy.
+  var AIRTABLE_TOKEN = 'VOTRE_TOKEN';
+  var AIRTABLE_BASE  = 'appY20zCunDeN9qLS';
+  var AIRTABLE_TABLE = 'tblxVBBDsNJjDMayp';
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // Correspondances valeurs form → libellés Airtable
+  var INTENTION_MAP = {
+    projet_6mois:    'Projet concret dans les 6 mois',
+    annee_prochaine: "Projet pour l'année prochaine",
+    en_maturation:   'Idée en cours de maturation',
+    curieux:         'Juste pour être au courant',
+  };
+
+  var GROUPE_MAP = {
+    solo:       'Solo',
+    duo:        'Duo',
+    amis:       'Entre amis',
+    famille:    'En famille',
+    entreprise: 'Entreprise / CE',
+    nsp:        'Je ne sais pas encore',
+  };
+
+  var PERIODE_MAP = {
+    printemps: 'Printemps',
+    ete:       'Été',
+    automne:   'Automne',
+    hiver:     'Hiver',
+    nsp:       'Pas encore défini',
+  };
+
+  var NOTIFICATION_MAP = {
+    email_seul:  'Email dès publication',
+    email_appel: 'Email + appel Franck',
+    auto:        'Je reviendrai consulter',
+  };
+
+  var SIMILAIRES_MAP = {
+    similaires:        'Oui — même destination / même esprit',
+    toutes:            'Oui — toute nouveauté we-rando',
+    uniquement_celle_ci: 'Non — uniquement celle-ci',
+  };
+
   // Pre-fill hidden inspiration field from URL param ?inspiration=nom-du-sejour
-  const params = new URLSearchParams(window.location.search);
-  const inspirationParam = params.get('inspiration');
+  var params = new URLSearchParams(window.location.search);
+  var inspirationParam = params.get('inspiration');
   if (inspirationParam) {
     document.getElementById('inspiration').value = inspirationParam;
   }
 
-  const form = document.getElementById('we-rando-form');
-  const confirmation = document.getElementById('confirmation');
+  var form         = document.getElementById('we-rando-form');
+  var confirmation = document.getElementById('confirmation');
+  var submitBtn    = form.querySelector('.btn-submit');
 
   // --- Validation helpers ---
 
   function showError(fieldId, message) {
-    const el = document.getElementById(fieldId + '-error');
+    var el = document.getElementById(fieldId + '-error');
     if (el) el.textContent = message;
-    const input = document.getElementById(fieldId);
+    var input = document.getElementById(fieldId);
     if (input) input.classList.add('invalid');
   }
 
   function clearError(fieldId) {
-    const el = document.getElementById(fieldId + '-error');
+    var el = document.getElementById(fieldId + '-error');
     if (el) el.textContent = '';
-    const input = document.getElementById(fieldId);
+    var input = document.getElementById(fieldId);
     if (input) input.classList.remove('invalid');
   }
 
   function showGroupError(groupId, errorId, message) {
-    const group = document.getElementById(groupId);
+    var group = document.getElementById(groupId);
     if (group) group.classList.add('invalid');
-    const el = document.getElementById(errorId);
+    var el = document.getElementById(errorId);
     if (el) el.textContent = message;
   }
 
   function clearGroupError(groupId, errorId) {
-    const group = document.getElementById(groupId);
+    var group = document.getElementById(groupId);
     if (group) group.classList.remove('invalid');
-    const el = document.getElementById(errorId);
+    var el = document.getElementById(errorId);
     if (el) el.textContent = '';
   }
 
   function getRadioValue(name) {
-    const checked = form.querySelector(`input[name="${name}"]:checked`);
+    var checked = form.querySelector('input[name="' + name + '"]:checked');
     return checked ? checked.value : null;
   }
 
@@ -50,7 +97,7 @@
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
-  // --- Live validation on inputs ---
+  // --- Live validation ---
 
   form.querySelector('#prenom').addEventListener('input', function () {
     if (this.value.trim()) clearError('prenom');
@@ -61,22 +108,40 @@
   });
 
   ['intention', 'notification', 'similaires'].forEach(function (name) {
-    form.querySelectorAll(`input[name="${name}"]`).forEach(function (radio) {
+    form.querySelectorAll('input[name="' + name + '"]').forEach(function (radio) {
       radio.addEventListener('change', function () {
         clearGroupError(name + '-group', name + '-error');
       });
     });
   });
 
-  // --- Form submission ---
+  // --- Airtable submission ---
+
+  function sendToAirtable(fields) {
+    return fetch(
+      'https://api.airtable.com/v0/' + AIRTABLE_BASE + '/' + AIRTABLE_TABLE,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + AIRTABLE_TOKEN,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ records: [{ fields: fields }] }),
+      }
+    ).then(function (res) {
+      if (!res.ok) return res.json().then(function (e) { throw e; });
+      return res.json();
+    });
+  }
+
+  // --- Form submit ---
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
 
-    let valid = true;
+    var valid = true;
 
-    // Prénom
-    const prenom = form.querySelector('#prenom').value.trim();
+    var prenom = form.querySelector('#prenom').value.trim();
     if (!prenom) {
       showError('prenom', 'Votre prénom est requis.');
       valid = false;
@@ -84,8 +149,7 @@
       clearError('prenom');
     }
 
-    // Email
-    const email = form.querySelector('#email').value.trim();
+    var email = form.querySelector('#email').value.trim();
     if (!email) {
       showError('email', 'Votre email est requis.');
       valid = false;
@@ -96,7 +160,6 @@
       clearError('email');
     }
 
-    // Intention (Q3)
     if (!getRadioValue('intention')) {
       showGroupError('intention-group', 'intention-error', 'Veuillez sélectionner une option.');
       valid = false;
@@ -104,7 +167,6 @@
       clearGroupError('intention-group', 'intention-error');
     }
 
-    // Notification (Q7)
     if (!getRadioValue('notification')) {
       showGroupError('notification-group', 'notification-error', 'Veuillez indiquer votre préférence.');
       valid = false;
@@ -112,7 +174,6 @@
       clearGroupError('notification-group', 'notification-error');
     }
 
-    // Similaires (Q8)
     if (!getRadioValue('similaires')) {
       showGroupError('similaires-group', 'similaires-error', 'Veuillez indiquer votre préférence.');
       valid = false;
@@ -121,34 +182,48 @@
     }
 
     if (!valid) {
-      // Scroll to first error
-      const firstError = form.querySelector('.invalid, .radio-group.invalid');
+      var firstError = form.querySelector('.invalid, .radio-group.invalid');
       if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
-    // Build payload
-    const payload = {
-      inspiration: document.getElementById('inspiration').value,
-      prenom,
-      email,
-      intention: getRadioValue('intention'),
-      groupe: getRadioValue('groupe'),
-      periode: getRadioValue('periode'),
-      message: form.querySelector('#message').value.trim(),
-      notification: getRadioValue('notification'),
-      similaires: getRadioValue('similaires'),
-      submitted_at: new Date().toISOString(),
+    // Build Airtable fields object
+    var fields = {
+      'Prénom':                   prenom,
+      'Email':                    email,
+      'Intention':                INTENTION_MAP[getRadioValue('intention')],
+      'Préférence de notification': NOTIFICATION_MAP[getRadioValue('notification')],
+      'Inspirations similaires':  SIMILAIRES_MAP[getRadioValue('similaires')],
+      'Date soumission':          new Date().toISOString(),
     };
 
-    console.info('[we-rando] Form payload:', payload);
+    var inspiration = document.getElementById('inspiration').value;
+    if (inspiration) fields['Inspiration'] = inspiration;
 
-    // TODO: replace with real API call (Fillout webhook / backend endpoint)
-    // fetch('/api/notify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+    var groupe = getRadioValue('groupe');
+    if (groupe) fields['Type de groupe'] = GROUPE_MAP[groupe];
 
-    // Show confirmation
-    form.classList.add('hidden');
-    confirmation.classList.remove('hidden');
-    confirmation.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    var periode = getRadioValue('periode');
+    if (periode) fields['Période souhaitée'] = PERIODE_MAP[periode];
+
+    var message = form.querySelector('#message').value.trim();
+    if (message) fields['Message pour Franck'] = message;
+
+    // Disable button during request
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Envoi en cours…';
+
+    sendToAirtable(fields)
+      .then(function () {
+        form.classList.add('hidden');
+        confirmation.classList.remove('hidden');
+        confirmation.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      })
+      .catch(function (err) {
+        console.error('[we-rando] Airtable error:', err);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Je veux être informé en avant-première →';
+        alert("Une erreur est survenue lors de l'envoi. Veuillez réessayer.");
+      });
   });
 })();
